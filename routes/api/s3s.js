@@ -11,5 +11,13 @@ router.post(
     s3controller.guardar
 )
 
+router.get(
+    `/buscar`,
+    s3controller.buscar
+)
+router.get(
+    `/buscarurl`,
+    s3controller.buscarurl
+)
 
 module.exports = router

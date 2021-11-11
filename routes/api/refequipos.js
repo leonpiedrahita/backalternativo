@@ -5,14 +5,16 @@ const refequipoController = require('../../controllers/refequipoController');
 const refequipoRegController = require('../../controllers//refequipoRegController');
 const auth = require('../../middleware/auth');
 
-//Hasta este punto ya vamos en api/usuario ya comenzamos a
+//Hasta este punto ya vamos en api/refequipo ya comenzamos a
 // manejar los metodos
 
-//.com/api/usuario/listar
+//.com/api/refequipo/listar
 router.get("/listar"/* ,auth.verificarAdministrador */,refequipoController.listar/*  ,equipo2Controller.listar */);
 
-//.com/api/usuario/register
+//.com/api/refequipo/registrar
 router.post("/registrar",refequipoController.registrar,refequipoRegController.registrar);
+
+router.patch("/actualizar/:id",refequipoController.actualizar,refequipoRegController.actualizar);
 
 
 

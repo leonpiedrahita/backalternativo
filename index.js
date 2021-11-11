@@ -5,14 +5,15 @@ const bodyParser = require("body-parser");//Permite que express pueda recibir di
 const cors = require("cors");
 const apiRouter = require('./routes/');//Importo el index donde están las rutas
 
-/* const aws = require("aws-sdk")
+const aws = require("aws-sdk")
 
-aws.config.update({
+/* aws.config.update({
     accessKeyId: process.env.AWS_CLAVE_ACCESO,
-    secretAccessKey: process.env.AWS_CLAVE_ACCESO_ESPECIAL
+    secretAccessKey: process.env.AWS_CLAVE_ACCESO_ESPECIAL,
+    region:process.env.REGION_BUCKET
     
-}) */
-
+})
+ */
 app.use(cors());
 
 app.use(bodyParser.json());// esto es para que express lea formatos Json

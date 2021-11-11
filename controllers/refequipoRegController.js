@@ -48,16 +48,13 @@ exports.registrar = async (req, res, next) => {
     tipodeinsercion: 'Registro',
     responsable: validationResponse.id
 
-
-    /*           propietario: req.body.propietario,
-              cliente: req.body.cliente, */
   });
   await equipo.save()
     .then(result => {
       console.log(result);
       console.log(req.respuesta + "Movimiento registrado");
       res.status(201).json({
-        message: 'Equipo creado'
+        message: 'Referencia de equipo creada'
       });
       next();
 
@@ -70,56 +67,35 @@ exports.registrar = async (req, res, next) => {
       });
       next(err);
     });
+};
+exports.actualizar = async (req, res, next) => {
+  const id = req.params.id;
+  const validationResponse = await tokenServices.decode(req.headers.token);
+
+  const equipo = new modelorefequipolog({
+    _id: new mongoose.Types.ObjectId(),
+    insercion: req.body,
+    tipodeinsercion: id +  'Actualización',
+    responsable: validationResponse.id
+
+  });
+  await equipo.save()
+    .then(result => {
+      console.log(result);
+      console.log(req.respuesta + "Actualización registrada");
+      res.status(201).json({
+        message: 'Referencia de equipo actualizada'
+      });
+      next();
 
 
-
-
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+      next(err);
+    });
 };
 
-/* exports.actualizar = async (req, res, next) => {
-  const id = req.params.id;
-  const updateOps = {};
-  const ensayo = Object.keys(req.body);
-  for (let i = 0; i < ensayo.length; i++) {
-    updateOps[ensayo[i]] = Object.values(req.body)[i]
-  }
-  await Equipo.update({ _id: id }, { $set: updateOps })
-    .exec()
-    .then(result => {
-      res.status(200).json({
-        message: 'Equipo Actualizado',
-        articulo: result
-      });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        error: err
-      });
-    });
-}
-
-exports.buscar = async (req, res, next) => {
-
-  await Equipo.find({ $and: [req.body.buscar] })
-    .then(equipo => {
-      Cliente.populate(equipo, { path: "propietario" })
-        .then(equipos => {
-          res.status(200).json(equipos);
-
-
-        })
-        .catch(err => {
-          console.log(err);
-          res.status(500).json({
-            error: err
-          });
-        });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        error: err
-      });
-    });
-}; */

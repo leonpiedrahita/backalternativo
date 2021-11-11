@@ -23,7 +23,7 @@ router.use("/articulo", articuloRouter);//api/articulo
 router.use("/categoria", categoriaRouter);//api/categoria
 router.use("/cliente", clienteRouter);//api/cliente
 router.use("/equipo", equipoRouter);//api/equipo
-router.use("/refequipo", refequipoRouter);//api/equipo
+router.use("/refequipo", refequipoRouter);//api/refequipo
 router.use("/reporte", reporteRouter);//api/reporte
 router.use("/firma", firmaRouter);//api/firma
 router.use("/orden", ordenRouter);//api/orden

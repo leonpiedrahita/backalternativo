@@ -48,6 +48,24 @@ exports.registrar = async (req, res, next) => {
           _id: new mongoose.Types.ObjectId(),
           nombre: req.body.nombre,
           marca: req.body.marca,
+          fabricante: req.body.fabricante,
+          servicio: req.body.servicio,
+          clasificacionriesgo: req.body.clasificacionriesgo,
+          periodicidadmantenimiento: req.body.periodicidadmantenimiento,
+          alto: req.body.alto,
+          ancho: req.body.ancho,
+          profundo: req.body.profundo,
+          peso: req.body.peso,
+          voltaje: req.body.voltaje,
+          corriente: req.body.corriente,
+          potencia: req.body.potencia,
+          principiodemedicion: req.body.principiodemedicion,
+          pruebasporhora: req.body.pruebasporhora,
+          temperatura: req.body.temperatura,
+          humedad: req.body.humedad,
+          agua: req.body.agua,
+          desague: req.body.desague,
+          recomendaciones: req.body.recomendaciones,
         });
         equipo
           .save()
@@ -72,20 +90,19 @@ exports.registrar = async (req, res, next) => {
     });
 };
 
-/* exports.actualizar = async (req, res, next) => {
+exports.actualizar = async (req, res, next) => {
   const id = req.params.id;
   const updateOps = {};
   const ensayo = Object.keys(req.body);
   for (let i = 0; i < ensayo.length; i++) {
     updateOps[ensayo[i]] = Object.values(req.body)[i]
   }
-  await Equipo.update({ _id: id }, { $set: updateOps })
+  await modelorefequipo.update({ _id: id }, { $set: updateOps })
     .exec()
     .then(result => {
-      res.status(200).json({
-        message: 'Equipo Actualizado',
-        articulo: result
-      });
+      console.log(result);
+      req.respuesta = 'Equipo actualizado'
+      next()
     })
     .catch(err => {
       console.log(err);
@@ -95,7 +112,7 @@ exports.registrar = async (req, res, next) => {
     });
 }
 
-exports.buscar = async (req, res, next) => {
+/* exports.buscar = async (req, res, next) => {
 
   await Equipo.find({ $and: [req.body.buscar] })
     .then(equipo => {

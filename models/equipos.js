@@ -5,6 +5,7 @@ const equipoSchema = mongoose.Schema({
     nombre: { type: String, required: true },
     marca: { type: String, required: true },
     serie: { type: String, required: true },
+    idreferencia: { type: String, required: true },
     propietario: { type: mongoose.Schema.Types.ObjectId, ref: 'Cliente', required: true },
     cliente: { type: mongoose.Schema.Types.ObjectId, ref: 'Cliente', required: true },
     ubicacionnombre:{ type: String, required: true },
