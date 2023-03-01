@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 
 
 
-const { Equipo, Cliente } = require('../models');//se debe llamar al modelo con el mismo nombre que se exporta
+const { Equipo, Cliente, Refequipo } = require('../models');//se debe llamar al modelo con el mismo nombre que se exporta
 //en el index de modelos
 const obtenerConexion = require('../conexiones/Factoriaconexion');
 const obtenerModelo = require('../conexiones/FactoriaModelo');
@@ -12,13 +12,14 @@ const tokenServices = require('../services/token');
 const connbase1 = obtenerConexion('Primerproyecto');
 const modeloequipo = obtenerModelo('Equipo', Equipo, connbase1)
 const modelocliente = obtenerModelo('Cliente', Cliente, connbase1)
+const modelorefequipo = obtenerModelo('Refequipo', Refequipo, connbase1)
 
 exports.listar = async (req, res, next) => {
 
 
   await modeloequipo.find()
 /*     .populate('propietario', 'nombre -_id') //este sirve para decir cual quiero enviar y cual no
- */    .populate('propietario cliente')
+ */    .populate('propietario cliente idreferencia')
 
     .then(equipo => {
       /*       modelocliente.populate(equipo,{path:"propietario"})
