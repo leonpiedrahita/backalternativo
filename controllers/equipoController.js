@@ -125,7 +125,42 @@ exports.actualizar = async (req, res, next) => {
       });
     });
 }
+exports.registrarreporte = async (req, res, next) => {
+  const validationResponse = await tokenServices.decode(req.headers.token);
+  const id = req.body.id_equipo;
+  const updateOps = {};
+  console.log(req.body)
+  const ensayo = Object.keys(req.body);
+  for (let i = 0; i < ensayo.length; i++) {
+    updateOps[ensayo[i]] = Object.values(req.body)[i]
+  }
+  await modeloequipo.update({ _id: id }, {
+    $set: updateOps, $push: {
+      historialdeservicios: {
+        $each:
+          [{
+            identificaciondereporte: req.idcreada,fechadefinalizacion: req.body.reporte.fechadefinalizacion, tipodeasistecia: req.body.reporte.tipodeasistencia, 
+            responsable: validationResponse._id, fecha: new Date()
+          }]
+      }
+    }
+  })
+    .exec()
+    .then(result => {
 
+      req.respuesta = 'Equipo Actualizado'
+      console.log(result);
+      next()
+
+
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+}
 exports.buscar = async (req, res, next) => {
 
   await Equipo.find({ $and: [req.body.buscar] })

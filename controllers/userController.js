@@ -71,6 +71,9 @@ exports.registrar =  async(req, res, next) => {
 };
 
 exports.ingresar = async(req, res, next) => {
+
+  
+
     await modelousuario.find({ email: req.body.email })
         .exec()
         .then(user => {

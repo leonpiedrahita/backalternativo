@@ -4,7 +4,7 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");//Permite que express pueda recibir diferentes formatos de datos
 const cors = require("cors");
 const apiRouter = require('./routes/');//Importo el index donde están las rutas
-
+require('dotenv').config();
 const aws = require("aws-sdk")
 
 /* aws.config.update({
@@ -19,8 +19,8 @@ app.use(cors());
 app.use(bodyParser.json());// esto es para que express lea formatos Json
 app.use(bodyParser.urlencoded({extended: true}));//esto es para leer este tipo 
 
-app.set('port',process.env.PORT || 3000)
-
+app.set('port',process.env.PORT || 3001)
+app.use(morgan("dev"));
 app.listen(app.get('port'),()=>{
     console.log('server up')
 })
