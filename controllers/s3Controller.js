@@ -1,75 +1,78 @@
-const fs = require('fs')
-const aws = require('aws-sdk')
+const fs = require("fs");
+
+const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 
-exports.guardar = async (req, res, next) => {
-    aws.config.update({
-        accessKeyId: process.env.AWS_CLAVE_ACCESO,
-        secretAccessKey: process.env.AWS_CLAVE_ACCESO_ESPECIAL,
-        region:process.env.REGION_BUCKET
-        
-    })
-    const s3 = new aws.S3();
+const s3 = new S3Client({
+  region: process.env.REGION_BUCKET,
+  credentials: {
+    accessKeyId: process.env.AWS_CLAVE_ACCESO,
+    secretAccessKey: process.env.AWS_CLAVE_ACCESO_ESPECIAL,
+  },
+});
+
+const guardar = async (req, res) => {
+  try {
     const ahora = Date.now();
-    try {
-        const fileStream = fs.createReadStream(req.file.path)
-        const s3res = await s3.upload({
-            Bucket: process.env.NOMBRE_BUCKET,
-            Key: `${ahora}-${req.file.originalname}`,
-            Body: fileStream,
+    const fileStream = fs.createReadStream(req.file.path);
+    
+    const uploadParams = {
+      Bucket: process.env.NOMBRE_BUCKET,
+      Key: `${ahora}-${req.file.originalname}`,
+      Body: fileStream,
+    };
 
-        }).promise();
+    const data = await s3.send(new PutObjectCommand(uploadParams));
+    
+    await fs.promises.unlink(req.file.path); // Eliminar archivo después de la subida
 
-        fs.unlink(req.file.path, () => {
-            res.json({ file: s3res.Location })
-        });
-    }
-    catch (err) {
-        res.status(422).json({ err })
-    }
+    res.json({ file: `https://${process.env.NOMBRE_BUCKET}.s3.${process.env.REGION_BUCKET}.amazonaws.com/${uploadParams.Key}` });
+  } catch (err) {
+    res.status(422).json({ error: err.message });
+  }
+};
 
+const buscar = async (req, res) => {
+  try {
+    const fileKey = req.body.fileKey;
 
-}
-
-exports.buscar = async (req, res, next) => {
-    aws.config.update({
-        accessKeyId: process.env.AWS_CLAVE_ACCESO,
-        secretAccessKey: process.env.AWS_CLAVE_ACCESO_ESPECIAL,
-        region:process.env.REGION_BUCKET
-        
-    })
-    var s3 = new aws.S3()
-    const fileKey = req.body.fileKey
-    console.log(fileKey)
     const downloadParams = {
-        Key: fileKey,
+      Bucket: process.env.NOMBRE_BUCKET,
+      Key: fileKey,
+    };
+
+    const { Body } = await s3.send(new GetObjectCommand(downloadParams));
+
+    const filePath = `./downloads/${fileKey}`;
+    const fileStream = fs.createWriteStream(filePath);
+    
+    Body.pipe(fileStream);
+    
+    fileStream.on("finish", () => {
+      res.status(200).json({ message: "Archivo descargado", filePath });
+    });
+  } catch (err) {
+    res.status(422).json({ error: err.message });
+  }
+};
+
+const buscarurl = async (req, res) => {
+  try {
+    const fileKey = req.body.fileKey;
+
+    const url = await getSignedUrl(
+      s3,
+      new GetObjectCommand({
         Bucket: process.env.NOMBRE_BUCKET,
-    }
-    s3.getObject(downloadParams, function (err, data) {
-        if (err) {
-            throw err
-        }
-        fs.writeFileSync('1634610454570-elefante.jpg', data.Body)
-        console.log('file downloaded successfully')
-        res.status(200).json({ data })
-    })
-
-}
-exports.buscarurl = async (req, res, next) => {
-    aws.config.update({
-        accessKeyId: process.env.AWS_CLAVE_FIRMA,
-        secretAccessKey: process.env.AWS_CLAVE_ESPECIAL_FIRMA,
-        region: process.env.REGION_BUCKET
-        
-    })
-    var s3url = new aws.S3()
-    const fileKey = req.body.fileKey
-    console.log(fileKey)
-    const url = await s3url.getSignedUrlPromise('getObject',{
-        Bucket:process.env.NOMBRE_BUCKET,
         Key: fileKey,
-        Expires: 30, 
-    })
-    res.status(200).json({ url })
+      }),
+      { expiresIn: 30 }
+    );
 
-}
+    res.status(200).json({ url });
+  } catch (err) {
+    res.status(422).json({ error: err.message });
+  }
+};
+module.exports = { guardar, buscar,buscarurl };

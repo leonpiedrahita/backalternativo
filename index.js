@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");//Permite que express pueda recibir di
 const cors = require("cors");
 const apiRouter = require('./routes/');//Importo el index donde están las rutas
 require('dotenv').config();
-const aws = require("aws-sdk")
+
 
 /* aws.config.update({
     accessKeyId: process.env.AWS_CLAVE_ACCESO,
