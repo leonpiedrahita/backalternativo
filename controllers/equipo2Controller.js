@@ -26,7 +26,7 @@ exports.listar = async (req, res, next) => {
       /* Cliente.populate(equipo,{path:"propietario"}) */
       /* Cliente.populate(equipo,{path:"propietario", select: 'nombre' }) */
 
-      console.log(equipo)
+      /*console.log(equipo)*/
       next()
 
     })

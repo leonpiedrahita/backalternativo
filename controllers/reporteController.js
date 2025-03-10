@@ -77,6 +77,7 @@ exports.registrar = async (req, res, next) => {
           firmacliente:  req.body.reporte.firmacliente,
           firmaingeniero:  req.body.reporte.firmaingeniero,
           ingeniero:  req.body.reporte.ingeniero,
+          reporteexterno: 0
         });
         reporte
           .save()
