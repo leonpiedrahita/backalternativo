@@ -59,14 +59,16 @@ exports.registrar = async (req, res, next) => {
           ubicacionnombre: req.body.nuevoequipo.ubicacion.nombre,
           ubicaciondireccion: req.body.nuevoequipo.ubicacion.direccion,
           estado: 'Activo',
-          fechadeinstalacion:"",
+          fechadeinstalacion: "",
           placadeinventario: req.body.nuevoequipo.placadeinventario,
-          tipodecontrato:req.body.nuevoequipo.tipodecontrato,
-          historialpropietarios:[{cliente: req.body.nuevoequipo.cliente.id,
-             propietario: req.body.nuevoequipo.propietario.id,
-              ubicacionnombre:  req.body.nuevoequipo.ubicacion.nombre,
+          tipodecontrato: req.body.nuevoequipo.tipodecontrato,
+          historialpropietarios: [{
+            cliente: req.body.nuevoequipo.cliente.id,
+            propietario: req.body.nuevoequipo.propietario.id,
+            ubicacionnombre: req.body.nuevoequipo.ubicacion.nombre,
             ubicaciondireccion: req.body.nuevoequipo.ubicacion.direccion,
-             responsable: validationResponse._id, fecha: new Date()}]
+            responsable: validationResponse._id, fecha: new Date()
+          }]
         });
         equipo
           .save()
@@ -126,41 +128,71 @@ exports.actualizar = async (req, res, next) => {
     });
 }
 exports.registrarreporte = async (req, res, next) => {
-  const validationResponse = await tokenServices.decode(req.headers.token);
-  const id = req.body.id_equipo;
-  const updateOps = {};
-  console.log(req.body)
-  const ensayo = Object.keys(req.body);
-  for (let i = 0; i < ensayo.length; i++) {
-    updateOps[ensayo[i]] = Object.values(req.body)[i]
-  }
-  await modeloequipo.update({ _id: id }, {
-    $set: updateOps, $push: {
-      historialdeservicios: {
-        $each:
-          [{
-            identificaciondereporte: req.idcreada,fechadefinalizacion: req.body.reporte.fechadefinalizacion, tipodeasistecia: req.body.reporte.tipodeasistencia, 
-            responsable: validationResponse._id, fecha: new Date()
-          }]
-      }
+   try {
+    const validationResponse = await tokenServices.decode(req.headers.token);
+    const id = req.body.id_equipo; // id_equipo ya es un ObjectId
+    const datosreporte = req.body.reporte;
+    const nuevoHistorial = {
+      identificaciondereporte: mongoose.Types.ObjectId(req.idcreada),
+      fechadefinalizacion: datosreporte.fechadefinalizacion,
+      tipodeasistecia: datosreporte.tipodeasistencia,
+      responsable: validationResponse._id,
+      reporteexterno: 0,
+      fecha: new Date(),
+    };
+  
+
+  await modeloequipo.updateOne(
+    { _id: id },
+    {
+      $push: { historialdeservicios: nuevoHistorial },
     }
-  })
-    .exec()
-    .then(result => {
+  );
 
-      req.respuesta = 'Equipo Actualizado'
-      console.log(result);
-      next()
+  req.respuesta = 'Equipo Actualizado';
+  console.log('Equipo actualizado correctamente');
+  next();
 
-
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        error: err
-      });
-    });
+} catch (err) {
+  console.log(err);
+  res.status(500).json({
+    error: err.message
+  });
 }
+};
+exports.registrarreporteexterno = async (req, res, next) => {
+  try {
+    const validationResponse = await tokenServices.decode(req.headers.token);
+    const id = mongoose.Types.ObjectId(JSON.parse(req.body.id_equipo)); // Convertir id_equipo a ObjectId
+    const datosreporte = JSON.parse(req.body.reporte);
+
+    const nuevoHistorial = {
+      identificaciondereporte: mongoose.Types.ObjectId(res.locals.idcreada),
+      fechadefinalizacion: datosreporte.fechadefinalizacion,
+      tipodeasistecia: datosreporte.tipodeasistencia,
+      responsable: mongoose.Types.ObjectId(validationResponse._id),
+      reporteexterno: 1,
+      llavereporte: res.locals.llave,
+      fecha: new Date(),
+    };
+
+    await modeloequipo.updateOne(
+      { _id: id },
+      {
+        $push: { historialdeservicios: nuevoHistorial },
+      }
+    );
+
+    res.status(201).json({
+      message: 'Equipo actualizado correctamente',
+      id: res.locals.idcreada,
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
 exports.buscar = async (req, res, next) => {
 
   await Equipo.find({ $and: [req.body.buscar] })

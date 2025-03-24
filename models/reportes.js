@@ -20,14 +20,16 @@ const reporteSchema = mongoose.Schema({
     pruebas: { type: String, required: false },
     repuestos: { type: String, required: false },
     observaciones: { type: String, required: false },
-    firmacliente:{ type: String, required: false },
-    firmaingeniero:{ type: String, required: false },
-    ingeniero:{ type: String, required: true },
-    reporteexterno:{ type: Number, required: true },
+    firmacliente: { type: String, required: false },
+    firmaingeniero: { type: String, required: false },
+    ingeniero: { type: String, required: true },
+    reporteexterno: { type: Number, required: true },
+    llavereporte:{ type: String, required: false },
 
-     
+
+
     //productImage: { type: String, required: false }
-    
+
 }, { timestamps: true });
 
 module.exports = reporteSchema;

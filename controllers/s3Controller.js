@@ -1,9 +1,9 @@
 const fs = require("fs");
-
+const path = require("path");
 const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
-
+// Configuración del cliente S3
 const s3 = new S3Client({
   region: process.env.REGION_BUCKET,
   credentials: {
@@ -12,30 +12,42 @@ const s3 = new S3Client({
   },
 });
 
-const guardar = async (req, res) => {
+// ✅ Subir archivo a S3
+const guardar = async (req, res, next) => {
   try {
     const ahora = Date.now();
-    const fileStream = fs.createReadStream(req.file.path);
-    
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No se ha recibido ningún archivo." });
+    }
+
     const uploadParams = {
       Bucket: process.env.NOMBRE_BUCKET,
       Key: `${ahora}-${req.file.originalname}`,
-      Body: fileStream,
+      Body: req.file.buffer,
     };
 
-    const data = await s3.send(new PutObjectCommand(uploadParams));
+    await s3.send(new PutObjectCommand(uploadParams));
     
-    await fs.promises.unlink(req.file.path); // Eliminar archivo después de la subida
+    // Pasar la llave al siguiente middleware
+    res.locals.llave = uploadParams.Key;
 
-    res.json({ file: `https://${process.env.NOMBRE_BUCKET}.s3.${process.env.REGION_BUCKET}.amazonaws.com/${uploadParams.Key}` });
+    // Continuar con el siguiente middleware
+    next();
+
   } catch (err) {
     res.status(422).json({ error: err.message });
   }
 };
 
+// ✅ Descargar archivo desde S3
 const buscar = async (req, res) => {
   try {
-    const fileKey = req.body.fileKey;
+    const { fileKey } = req.body;
+
+    if (!fileKey) {
+      return res.status(400).json({ error: "No se proporcionó la clave del archivo (fileKey)." });
+    }
 
     const downloadParams = {
       Bucket: process.env.NOMBRE_BUCKET,
@@ -44,22 +56,38 @@ const buscar = async (req, res) => {
 
     const { Body } = await s3.send(new GetObjectCommand(downloadParams));
 
-    const filePath = `./downloads/${fileKey}`;
+    const downloadsDir = path.join(__dirname, "downloads");
+    const filePath = path.join(downloadsDir, fileKey);
+
+    // Asegurar que la carpeta "downloads" existe
+    if (!fs.existsSync(downloadsDir)) {
+      fs.mkdirSync(downloadsDir);
+    }
+
     const fileStream = fs.createWriteStream(filePath);
-    
-    Body.pipe(fileStream);
-    
-    fileStream.on("finish", () => {
-      res.status(200).json({ message: "Archivo descargado", filePath });
-    });
+
+    Body.pipe(fileStream)
+      .on("error", (err) => {
+        console.error("Error en la descarga:", err);
+        return res.status(500).json({ error: "Error al guardar el archivo localmente." });
+      })
+      .on("close", () => {
+        res.status(200).json({ message: "Archivo descargado correctamente", filePath });
+      });
+
   } catch (err) {
+    console.error("Error al buscar archivo:", err);
     res.status(422).json({ error: err.message });
   }
 };
 
+// ✅ Obtener URL firmada de S3
 const buscarurl = async (req, res) => {
   try {
-    const fileKey = req.body.fileKey;
+    const { fileKey } = req.body;
+    if (!fileKey) {
+      return res.status(400).json({ error: "No se proporcionó la clave del archivo (fileKey)." });
+    }
 
     const url = await getSignedUrl(
       s3,
@@ -67,12 +95,14 @@ const buscarurl = async (req, res) => {
         Bucket: process.env.NOMBRE_BUCKET,
         Key: fileKey,
       }),
-      { expiresIn: 30 }
+      { expiresIn: 30 } // Expira en 30 segundos
     );
 
-    res.status(200).json({ url });
+    res.status(200).json({ message: "URL generada correctamente", url });
   } catch (err) {
+    console.error("Error al generar URL firmada:", err);
     res.status(422).json({ error: err.message });
   }
 };
-module.exports = { guardar, buscar,buscarurl };
+
+module.exports = { guardar, buscar, buscarurl };

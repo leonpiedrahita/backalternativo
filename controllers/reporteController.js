@@ -102,6 +102,39 @@ exports.registrar = async (req, res, next) => {
       
     });
 };
+exports.registrarexterno = async (req, res, next) => {
+  const reporteexterno = JSON.parse(req.body.reporte);
+  try {
+    const reporte = new modeloreporte({
+      _id: new mongoose.Types.ObjectId(),
+      tipodeasistencia: reporteexterno.tipodeasistencia,
+      fechadeinicio: reporteexterno.fechadeinicio,
+      fechadefinalizacion: reporteexterno.fechadefinalizacion,
+      infoequipo: reporteexterno.infoequipo,
+      propietario: reporteexterno.propietario,
+      nombrecliente: reporteexterno.nombrecliente,
+      nitcliente: reporteexterno.nitcliente,
+      sedecliente: reporteexterno.sedecliente,
+      direccioncliente: reporteexterno.direccioncliente,
+      ingeniero: reporteexterno.ingeniero,
+      reporteexterno: 1,
+      llavereporte: res.locals.llave,
+    });
+
+    const result = await reporte.save();
+    console.log('Resultado registrar reporte externo',result);
+
+    // Guardar datos en res.locals para el siguiente middleware
+    res.locals.respuesta = 'Reporte externo creado';
+    res.locals.idcreada = result._id;
+
+    next(); // Continuar con el siguiente middleware
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err.message });
+  }
+};
 
 exports.actualizar = async (req, res, next) => {
   const id = req.params.id;

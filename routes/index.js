@@ -27,7 +27,7 @@ router.use("/refequipo", refequipoRouter);//api/refequipo
 router.use("/reporte", reporteRouter);//api/reporte
 router.use("/firma", firmaRouter);//api/firma
 router.use("/orden", ordenRouter);//api/orden
-router.use("/imagen", s3sRouter);//api/imagen
+router.use("/s3", s3sRouter);//api/s3
 
 
 module.exports = router;

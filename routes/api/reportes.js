@@ -15,7 +15,8 @@ router.get("/listar",reporteController.listar);
 //.com/api/usuario/register
 router.post("/registrar",reporteController.registrar,equipoController.registrarreporte,reporteRegController.registrar);
 
-
+//.com/api/reporte/registrarexterno
+router.post("/registrarexterno",reporteController.registrarexterno);
 
 //.com/api/usuario/actualizar/id del elemento de la colección que quiero modificar
 router.patch("/actualizar/:id",reporteController.actualizar);

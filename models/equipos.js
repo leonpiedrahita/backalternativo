@@ -1,5 +1,16 @@
 const mongoose = require('mongoose');
 
+const historialServicioSchema = mongoose.Schema({
+    identificaciondereporte: { type: mongoose.Schema.Types.ObjectId, required: true },
+    fechadefinalizacion: { type: String, required: true },
+    tipodeasistecia: { type: String, required: true },
+    responsable: { type: mongoose.Schema.Types.ObjectId, required: true },
+    reporteexterno: { type: Number, required: true },
+    llavereporte: { type: String, required: false },
+
+    fecha: { type: Date, required: true },
+});
+
 const equipoSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     nombre: { type: String, required: true },
@@ -15,7 +26,7 @@ const equipoSchema = mongoose.Schema({
     fechadeinstalacion:{ type: String, required: false },
     placadeinventario:{ type: String, required: true },
     tipodecontrato:{ type: String, required: true },
-    historialdeservicios:{ type: Array, required: false },
+    historialdeservicios: { type: [historialServicioSchema], required: false },
      
     //productImage: { type: String, required: false }
     
