@@ -12,10 +12,10 @@ const router = express.Router();
 
 // Middleware para verificar si el archivo existe
 const validarArchivo = (req, res, next) => {
-    console.log("file",req.file)
+    /* console.log("file",req.file) */
     /* console.log('Equipo.id',JSON.parse(req.body.id_equipo))
     console.log(typeof(req.body.id_equipo))  */  
-    console.log("reporte",JSON.parse(req.body.reporte)) 
+    /* console.log("reporte",JSON.parse(req.body.reporte))  */
   if (!req.file) {
     return res.status(400).json({ message: 'No se ha proporcionado un archivo' });
   }
@@ -28,7 +28,7 @@ router.post(
     '/guardar',
     upload.single('file'),
     validarArchivo,
-    s3controller.guardar,
+    s3controller.guardarreporte,
     reportecontroller.registrarexterno, 
     equipocontroller.registrarreporteexterno,
     (req, res) => {

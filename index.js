@@ -24,7 +24,7 @@ app.use(morgan("dev"));
 app.listen(app.get('port'),()=>{
     console.log('server up')
 })
-app.use(morgan("dev"));
+
 
 app.use("/api", apiRouter);
 

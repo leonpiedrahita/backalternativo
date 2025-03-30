@@ -13,17 +13,17 @@ const s3 = new S3Client({
 });
 
 // ✅ Subir archivo a S3
-const guardar = async (req, res, next) => {
+const guardarreporte = async (req, res, next) => {
   try {
     const ahora = Date.now();
-
+    const seriereporte = (JSON.parse(req.body.reporte)).infoequipo.serie;
     if (!req.file) {
       return res.status(400).json({ error: "No se ha recibido ningún archivo." });
     }
 
     const uploadParams = {
       Bucket: process.env.NOMBRE_BUCKET,
-      Key: `${ahora}-${req.file.originalname}`,
+      Key: `${seriereporte}-${ahora}-${req.file.originalname}`,
       Body: req.file.buffer,
     };
 
@@ -105,4 +105,4 @@ const buscarurl = async (req, res) => {
   }
 };
 
-module.exports = { guardar, buscar, buscarurl };
+module.exports = { guardarreporte, buscar, buscarurl };
