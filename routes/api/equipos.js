@@ -20,5 +20,6 @@ router.post("/registrar",equipoController.registrar,equipo2Controller.registrar)
 router.patch("/actualizar/:id",equipoController.actualizar,equipo2Controller.actualizar);
 
 router.get("/buscar",equipoController.buscar);
+router.get("/listaruno/:id",equipoController.listaruno);
 
 module.exports = router;

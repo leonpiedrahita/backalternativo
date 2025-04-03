@@ -45,7 +45,7 @@ exports.registrar = async (req, res, next) => {
     ultimaetapa: 1,
     etapas: req.body.etapas,
     equipo: req.body.equipo._id,
-    estado: "Bloqueado"
+    estado: "Abierta"
   });
   orden
     .save()

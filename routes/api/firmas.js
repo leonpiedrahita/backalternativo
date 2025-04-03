@@ -11,9 +11,9 @@ const auth = require('../../middleware/auth');
 router.get("/listar",auth.verificarAdministrador,firmaController.listar);
 
 //.com/api/firma/registrar
-router.post("/registrar",auth.verificarAdministrador,firmaController.registrar);
+router.post("/registrar"/* ,auth.verificarAdministrador */,firmaController.registrar);
 //.com/api/firma/buscar
-router.get("/buscar",auth.verificarAdministrador,firmaController.buscar);
+router.get("/buscar"/* ,auth.verificarAdministrador */,firmaController.buscar);
 
 
 

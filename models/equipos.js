@@ -10,6 +10,11 @@ const historialServicioSchema = mongoose.Schema({
 
     fecha: { type: Date, required: true },
 });
+const documentosLegalesSchema = mongoose.Schema({
+    nombredocumento: { type: String, required: true },
+    llavedocumento: { type: String, required: true },
+    fecha: { type: Date, required: true },
+});
 
 const equipoSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
@@ -27,6 +32,7 @@ const equipoSchema = mongoose.Schema({
     placadeinventario:{ type: String, required: true },
     tipodecontrato:{ type: String, required: true },
     historialdeservicios: { type: [historialServicioSchema], required: false },
+    documentoslegales: { type: [documentosLegalesSchema], required: false }
      
     //productImage: { type: String, required: false }
     

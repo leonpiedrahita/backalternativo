@@ -193,6 +193,35 @@ exports.registrarreporteexterno = async (req, res, next) => {
     res.status(500).json({ error: err.message });
   }
 };
+exports.registrardocumento = async (req, res, next) => {
+  try {
+
+    const nombredocumento = JSON.parse(req.body.nombredocumento);
+    const id = mongoose.Types.ObjectId((JSON.parse(req.body.id_equipo))); // Convertir id_equipo a ObjectId
+
+    const nuevoDocumento = {
+      nombredocumento: nombredocumento,
+      llavedocumento: res.locals.llave,
+      fecha: new Date(),
+    };
+
+    await modeloequipo.updateOne(
+      { _id: id },
+      {
+        $push: { documentoslegales: nuevoDocumento },
+      }
+    );
+
+    res.status(201).json({
+      message: 'Documento cargado correctamente',
+      id: res.locals.idcreada,
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
 exports.buscar = async (req, res, next) => {
 
   await Equipo.find({ $and: [req.body.buscar] })
@@ -216,4 +245,24 @@ exports.buscar = async (req, res, next) => {
         error: err
       });
     });
+};
+exports.listaruno = async (req, res, next) => {
+  try {
+    const { id } = req.params; // Obtener el ID desde los parámetros de la URL
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "ID inválido" });
+    }
+
+    const equipo = await modeloequipo.findById(id).exec();
+
+    if (!equipo) {
+      return res.json("nada");
+    }
+
+    res.status(200).json(equipo);
+  } catch (error) {
+    console.error("Error en listaruno:", error);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
 };
